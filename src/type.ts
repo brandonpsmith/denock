@@ -12,6 +12,8 @@ export interface DenockOptions {
   requestBody?: any;
   /** This is the status code that will be returned on interception*/
   replyStatus?: number;
+  /** These are the headers that will be returned on interception*/
+  responseHeaders?: Headers;
   /** This is the body that will be returned on interception*/
   responseBody: any;
   /** Represent the number of call you wants to intercept*/

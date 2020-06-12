@@ -1,17 +1,17 @@
-import { DenockOptions, Interceptor, RequestData } from "./type.ts";
+import { DenockOptions, Interceptor } from "./type.ts";
 
 import { formatTargetUrlFromOptions } from "./formatTargetUrlFromOptions.ts";
 import { extractMethodAndBodyFromRequestInitObject } from "./extractMethodAndBodyFromRequestInitObject.ts";
 import { extractBodyFromRequest } from "./extractBodyFromRequest.ts";
 import { verifyMatch } from "./verifyMatch.ts";
-import { TypeGuardResult, determineInputType } from "./typeguard.ts";
+import { determineInputType } from "./typeguard.ts";
 
 function denock(options: DenockOptions): Interceptor {
   const originalFetch = window.fetch;
   let callCounter = 0;
   let callLimit = 1;
 
-  const { responseBody, interception, replyStatus } = options;
+  const { responseHeaders, responseBody, interception, replyStatus } = options;
 
   callLimit = interception || 1;
 
@@ -80,8 +80,12 @@ function denock(options: DenockOptions): Interceptor {
       window.fetch = originalFetch;
     }
 
+    const status = replyStatus || 200;
+
     return {
-      status: replyStatus || 200,
+      status,
+      ok: status >= 200 && status <= 299,
+      headers: responseHeaders,
       json: () => responseBody as any,
     } as Response;
   };
