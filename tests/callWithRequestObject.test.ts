@@ -43,6 +43,46 @@ Deno.test(
 );
 
 Deno.test(
+  `denock() : with Request object and empty queryParams object
+  Given the intent to call POST https://jsonplaceholder.typicode.com/todos
+  When fetch() is call with a Request object
+  Then the call should be intercepted and return the expected responseBody
+  `,
+  async () => {
+    denock({
+      method: "POST",
+      protocol: "https",
+      host: "jsonplaceholder.typicode.com",
+      path: "/todos",
+      queryParams: {},
+      responseBody: { test: "3" },
+      replyStatus: 201,
+    });
+
+    const request: Request = new Request(
+      `https://jsonplaceholder.typicode.com/todos`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          userId: 1,
+          id: 23024,
+          title: "delectus aut autem",
+          completed: false,
+        }),
+      },
+    );
+
+    const response = await fetch(request);
+
+    const body = await response.json();
+    const status = await response.status;
+
+    assertEquals(body, { test: "3" });
+    assertEquals(status, 201);
+  },
+);
+
+Deno.test(
   `denock() : with Request object
   Given the intent to call fetch() POST https://jsonplaceholder.typicode.com/todos with a Request object
   When the payload is different
